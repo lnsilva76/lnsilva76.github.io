@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>TikTok Callback</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 16px; background: #fff; color: #111; }
+  code { display: block; padding: .75rem; background: #f2f2f2; border-radius: 6px; word-break: break-all; }
+  button { margin: .5rem 0 1.5rem; padding: .5rem 1rem; font-size: 1rem; cursor: pointer; }
+  @media (prefers-color-scheme: dark) { body { background: #111; color: #eee; } code { background: #222; } }
+</style>
+</head>
+<body>
+<h1>Autorização TikTok Shop</h1>
+<p id="msg">Copie o <strong>code</strong> e rode <code>python mcp\tiktok_auth.py &lt;code&gt;</code> logo em seguida (ele expira rápido).</p>
+<div id="campos"></div>
+<p><small>Esta página não envia nem armazena nenhum dado.</small></p>
+<script>
+  const params = new URLSearchParams(location.search);
+  const campos = document.getElementById("campos");
+  for (const nome of ["code", "state"]) {
+    const valor = params.get(nome);
+    if (!valor) continue;
+    const h = document.createElement("h2");
+    h.textContent = nome;
+    const c = document.createElement("code");
+    c.textContent = valor;
+    const b = document.createElement("button");
+    b.textContent = "Copiar " + nome;
+    b.onclick = () => navigator.clipboard.writeText(valor).then(() => { b.textContent = "Copiado!"; });
+    campos.append(h, c, b);
+  }
+  if (!params.get("code")) document.getElementById("msg").textContent = "Nenhum code na URL.";
+</script>
+</body>
+</html>
