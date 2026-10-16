@@ -15,22 +15,25 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 
-TOKEN_URL = "https://auth.tiktok-shops.com/api/v2/token/get"
+AUTH_URL = "https://auth.tiktok-shops.com/api/v2/token"
 TOKENS_PATH = Path(os.environ.get("TIKTOK_TOKENS_PATH", Path.home() / ".eld-tiktok" / "tokens.json"))
 
 
-def exchange_code(code, app_key, app_secret):
-    query = urllib.parse.urlencode({
-        "app_key": app_key,
-        "app_secret": app_secret,
-        "auth_code": code,
-        "grant_type": "authorized_code",
-    })
-    with urllib.request.urlopen(f"{TOKEN_URL}?{query}", timeout=30) as resp:
+def _token_call(endpoint, params):
+    query = urllib.parse.urlencode(params)
+    with urllib.request.urlopen(f"{AUTH_URL}/{endpoint}?{query}", timeout=30) as resp:
         body = json.load(resp)
     if body.get("code") != 0:
-        raise RuntimeError(f"Falha na troca do code: {body.get('code')} {body.get('message')} (request_id={body.get('request_id')})")
+        raise RuntimeError(f"Falha em token/{endpoint}: {body.get('code')} {body.get('message')} (request_id={body.get('request_id')})")
     return body["data"]
+
+
+def exchange_code(code, app_key, app_secret):
+    return _token_call("get", {"app_key": app_key, "app_secret": app_secret, "auth_code": code, "grant_type": "authorized_code"})
+
+
+def refresh_tokens(refresh_token, app_key, app_secret):
+    return _token_call("refresh", {"app_key": app_key, "app_secret": app_secret, "refresh_token": refresh_token, "grant_type": "refresh_token"})
 
 
 def save_tokens(data, path=TOKENS_PATH):
