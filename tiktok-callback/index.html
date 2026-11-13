@@ -21,7 +21,7 @@
 <script>
   const params = new URLSearchParams(location.search);
   const campos = document.getElementById("campos");
-  for (const nome of ["code", "state"]) {
+  for (const nome of ["code", "shop_id", "state"]) {  // shop_id: retorno da Shopee
     const valor = params.get(nome);
     if (!valor) continue;
     const h = document.createElement("h2");
